@@ -1,20 +1,23 @@
-const express = require("express"),
-  app = express(),
-  puerto = 3000,
-  bodyParser = require("body-parser");
-const mysql = require("mysql");
-const cors = require("cors");
-const multer = require("multer");
+import { DB_HOST, DB_NAME, DB_PASSW0RD, DB_PORT, DB_USER } from "./config.js";
+import express from "express";
+import bodyParser from "body-parser";
+import mysql from "mysql";
+import cors from "cors";
+import multer from "multer";
+import { PORT } from "./config.js";
+
+const app = express();
 
 app.use("/uploads", express.static("uploads"));
 
 // Create connection to MySQL database
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "ecommerce_db",
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSW0RD,
+  database: DB_NAME,
+  port: DB_PORT,
 });
 
 // Connect to MySQL database
@@ -41,7 +44,7 @@ const upload = multer({ storage });
 
 app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
-app.use(cors({ "Access-Control-Allow-Origin": "http://localhost:3000/" }));
+app.use(cors({ "Access-Control-Allow-Origin": "http://localhost:4000/" }));
 
 // Define a route for getting all clients
 // ORDER by cl_id desc - this could be place after clientes
@@ -105,7 +108,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = "http://localhost:3000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo = "http://localhost:4000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
@@ -129,7 +132,7 @@ app.post("/empleados", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo = "http://localhost:3000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
+    em_photo = "http://localhost:4000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newempleado = { em_nombre, em_cedula, em_celular };
@@ -185,7 +188,7 @@ app.put("/clientes/:cl_id", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = "http://localhost:3000/uploads/" + req.file.filename;
+    cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
@@ -218,7 +221,7 @@ app.put("/empleados/:em_id", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo = "http://localhost:3000/uploads/" + req.file.filename;
+    em_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const updatedEmpleado = { em_nombre, em_cedula, em_celular };
@@ -291,12 +294,12 @@ app.delete("/empleados/:em_id", (req, res) => {
 // });
 
 // Una vez definidas nuestras rutas podemos iniciar el servidor
-app.listen(puerto, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     // Aquí manejar el error
     console.error("Error escuchando: ", err);
     return;
   }
   // Si no se detuvo arriba con el return, entonces todo va bien ;)
-  console.log(`Escuchando en el puerto :${puerto}`);
+  console.log(`Escuchando en el puerto :${PORT}`);
 });
