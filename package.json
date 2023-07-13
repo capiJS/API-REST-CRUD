@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "this a trial",
   "main": "index.js",
-  "type": "module",
+  "type":"module",
   "scripts": {
     "start": "nodemon index.js",
-    "start:watch": "nodemon",
-    "build": "tsc",
-    "prod": "npm run build && npm run start"
+    "start:watch": "nodemon"
   },
   "author": "carlos maicol",
   "license": "ISC",
