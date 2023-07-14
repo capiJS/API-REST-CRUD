@@ -1,7 +1,7 @@
 import { DB_HOST, DB_NAME, DB_PASSW0RD, DB_PORT, DB_USER } from "./config.js";
 import express from "express";
 import bodyParser from "body-parser";
-import mysql from "mysql";
+import mysql2 from "mysql2";
 import cors from "cors";
 import multer from "multer";
 import { PORT } from "./config.js";
@@ -12,7 +12,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Create connection to MySQL database
 
-const db = mysql.createConnection({
+const db = mysql2.createConnection({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSW0RD,
