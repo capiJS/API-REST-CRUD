@@ -44,7 +44,13 @@ const upload = multer({ storage });
 
 app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
-app.use(cors({ "Access-Control-Allow-Origin": `http://${DB_HOST}:${PORT}/` }));
+app.use(
+  cors({
+    "Access-Control-Allow-Origin":
+      "https://api-rest-crud-production.up.railway.app/",
+  })
+);
+// app.use(cors({ "Access-Control-Allow-Origin": "http://localhost:4000/" }));
 
 // Define a route for getting all clients
 // ORDER by cl_id desc - this could be place after clientes
@@ -109,7 +115,9 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo =
+      "https://api-rest-crud-production.up.railway.app/uploads/" +
+      req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
@@ -161,19 +169,19 @@ app.post("/empleados", upload.single("em_photo"), (req, res) => {
 // });
 
 // Define a route for getting a client by their ID
-// app.get("/clientes/:cl_id", (req, res) => {
-//   const id = req.params.cl_id;
-//   db.query("SELECT * FROM clientes WHERE cl_id = ?", id, (err, results) => {
-//     if (err) {
-//       console.error("Error getting user from MySQL database: " + err.stack);
-//       return res.status(500).send("Error getting cliente from database");
-//     }
-//     if (results.length === 0) {
-//       return res.status(404).send("cliente not found");
-//     }
-//     return res.json(results);
-//   });
-// });
+app.get("/clientes/:cl_id", (req, res) => {
+  const id = req.params.cl_id;
+  db.query("SELECT * FROM clientes WHERE cl_id = ?", id, (err, results) => {
+    if (err) {
+      console.error("Error getting user from MySQL database: " + err.stack);
+      return res.status(500).send("Error getting cliente from database");
+    }
+    if (results.length === 0) {
+      return res.status(404).send("cliente not found");
+    }
+    return res.json(results);
+  });
+});
 
 // app.get("/traerproductosporid/:id", (request, reponse) => {
 //   const id = request.params.id;
