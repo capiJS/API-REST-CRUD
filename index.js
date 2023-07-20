@@ -44,7 +44,7 @@ const upload = multer({ storage });
 
 app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
-app.use(cors({ "Access-Control-Allow-Origin": "http://localhost:4000/" }));
+app.use(cors({ "Access-Control-Allow-Origin": `http://${DB_HOST}:${PORT}/` }));
 
 // Define a route for getting all clients
 // ORDER by cl_id desc - this could be place after clientes
@@ -102,13 +102,14 @@ app.get("/pagos", (req, res) => {
 //   response.status(200).send({ message: "GET OK", data: respuesta, params });
 // });
 
+//POST CLIENTES----------------------------------------------------------------
 // Define a route for adding a new client
 app.post("/clientes", upload.single("cl_photo"), (req, res) => {
   const { cl_nombre, cl_cedula, cl_celular } = req.body;
 
   let cl_photo;
   if (req.file) {
-    cl_photo = "http://localhost:4000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
