@@ -161,19 +161,19 @@ app.post("/empleados", upload.single("em_photo"), (req, res) => {
 // });
 
 // Define a route for getting a client by their ID
-app.get("/clientes/:cl_id", (req, res) => {
-  const id = req.params.cl_id;
-  db.query("SELECT * FROM clientes WHERE cl_id = ?", id, (err, results) => {
-    if (err) {
-      console.error("Error getting user from MySQL database: " + err.stack);
-      return res.status(500).send("Error getting cliente from database");
-    }
-    if (results.length === 0) {
-      return res.status(404).send("cliente not found");
-    }
-    return res.json(results);
-  });
-});
+// app.get("/clientes/:cl_id", (req, res) => {
+//   const id = req.params.cl_id;
+//   db.query("SELECT * FROM clientes WHERE cl_id = ?", id, (err, results) => {
+//     if (err) {
+//       console.error("Error getting user from MySQL database: " + err.stack);
+//       return res.status(500).send("Error getting cliente from database");
+//     }
+//     if (results.length === 0) {
+//       return res.status(404).send("cliente not found");
+//     }
+//     return res.json(results);
+//   });
+// });
 
 // app.get("/traerproductosporid/:id", (request, reponse) => {
 //   const id = request.params.id;
