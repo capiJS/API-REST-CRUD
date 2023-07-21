@@ -116,8 +116,8 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
   let cl_photo;
   if (req.file) {
     cl_photo =
-      "https://api-rest-crud-production.up.railway.app/uploads/" +
-      req.file.filename; // Get the filename of the newCliente photo
+      "https://api-rest-crud-production.up.railway.app/" + req.file.filename; // Get the filename of the newCliente photo
+    // cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
@@ -141,7 +141,9 @@ app.post("/empleados", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo = "http://localhost:4000/uploads/" + req.file.filename; // Get the filename of the newCliente photo
+    em_photo =
+      "https://api-rest-crud-production.up.railway.app/" + req.file.filename; // Get the filename of the newCliente photo
+    // em_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const newempleado = { em_nombre, em_cedula, em_celular };
@@ -197,7 +199,9 @@ app.put("/clientes/:cl_id", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    cl_photo =
+      "https://api-rest-crud-production.up.railway.app/" + req.file.filename;
+    // cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
@@ -230,7 +234,9 @@ app.put("/empleados/:em_id", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    em_photo =
+      "https://api-rest-crud-production.up.railway.app/" + req.file.filename;
+    // em_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const updatedEmpleado = { em_nombre, em_cedula, em_celular };
@@ -302,13 +308,12 @@ app.delete("/empleados/:em_id", (req, res) => {
 //   reponse.status(200).send("DELETE  OK");
 // });
 
-// Una vez definidas nuestras rutas podemos iniciar el servidor
+// prueba puerto run
 app.listen(PORT, (err) => {
   if (err) {
-    // Aquí manejar el error
     console.error("Error escuchando: ", err);
     return;
   }
-  // Si no se detuvo arriba con el return, entonces todo va bien ;)
+
   console.log(`Escuchando en el puerto :${PORT}`);
 });
