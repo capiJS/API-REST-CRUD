@@ -46,11 +46,9 @@ app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(
   cors({
-    "Access-Control-Allow-Origin":
-      "https://api-rest-crud-production.up.railway.app/",
+    "Access-Control-Allow-Origin": `http://${DB_HOST}:${PORT}/`,
   })
 );
-// app.use(cors({ "Access-Control-Allow-Origin": "http://localhost:4000/" }));
 
 // Define a route for getting all clients
 // ORDER by cl_id desc - this could be place after clientes
@@ -115,9 +113,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo =
-      "https://api-rest-crud-production.up.railway.app/" + req.file.filename; // Get the filename of the newCliente photo
-    // cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    cl_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
@@ -141,9 +137,7 @@ app.post("/empleados", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo =
-      "https://api-rest-crud-production.up.railway.app/" + req.file.filename; // Get the filename of the newCliente photo
-    // em_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newempleado = { em_nombre, em_cedula, em_celular };
@@ -199,9 +193,7 @@ app.put("/clientes/:cl_id", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo =
-      "https://api-rest-crud-production.up.railway.app/" + req.file.filename;
-    // cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
   }
 
   const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
@@ -234,9 +226,7 @@ app.put("/empleados/:em_id", upload.single("em_photo"), (req, res) => {
 
   let em_photo;
   if (req.file) {
-    em_photo =
-      "https://api-rest-crud-production.up.railway.app/" + req.file.filename;
-    // em_photo = "http://localhost:4000/uploads/" + req.file.filename;
+    em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename;
   }
 
   const updatedEmpleado = { em_nombre, em_cedula, em_celular };
