@@ -113,7 +113,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo = `/uploads/` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
