@@ -120,7 +120,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = `${RAILWAY_IMAGE_URL}` + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo = `${RAILWAY_IMAGE_URL}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
