@@ -1,4 +1,11 @@
-import { DB_HOST, DB_NAME, DB_PASSW0RD, DB_PORT, DB_USER } from "./config.js";
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSW0RD,
+  DB_PORT,
+  DB_USER,
+  RAILWAY_IMAGE_URL,
+} from "./config.js";
 import express from "express";
 import bodyParser from "body-parser";
 import mysql2 from "mysql2";
@@ -113,7 +120,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
 
   let cl_photo;
   if (req.file) {
-    cl_photo = `/uploads/` + req.file.filename; // Get the filename of the newCliente photo
+    cl_photo = `${RAILWAY_IMAGE_URL}` + req.file.filename; // Get the filename of the newCliente photo
   }
 
   const newcliente = { cl_nombre, cl_cedula, cl_celular };
