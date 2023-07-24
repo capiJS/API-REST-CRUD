@@ -115,7 +115,7 @@ app.post("/clientes", upload.single("cl_photo"), (req, res) => {
   if (req.file) {
     cl_photo =
       "https://api-rest-crud-production.up.railway.app" +
-      "/uploads" +
+      // "/uploads" +
       req.file.filename; // Get the filename of the newCliente photo
   }
 
