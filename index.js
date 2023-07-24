@@ -1,11 +1,4 @@
-import {
-  DB_HOST,
-  DB_NAME,
-  DB_PASSW0RD,
-  DB_PORT,
-  DB_USER,
-  RAILWAY_IMAGE_URL,
-} from "./config.js";
+import { DB_HOST, DB_NAME, DB_PASSW0RD, DB_PORT, DB_USER } from "./config.js";
 import express from "express";
 import bodyParser from "body-parser";
 import mysql2 from "mysql2";
