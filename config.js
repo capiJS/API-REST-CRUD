@@ -5,4 +5,4 @@ export const DB_PASSW0RD = process.env.DB_PASSW0RD || "";
 export const DB_NAME = process.env.DB_NAME || "ecommerce_db";
 export const DB_PORT = process.env.DB_PORT || "3306";
 export const RAILWAY_IMAGE_URL =
-  process.env.RAILWAY_IMAGE_URL || "http://localhost:4000/uploads/";
+  process.env.RAILWAY_IMAGE_URL || "http://localhost:4000";
