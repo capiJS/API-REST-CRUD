@@ -124,34 +124,57 @@ app.get("/pagos", (req, res) => {
 
 //POST CLIENTES----------------------------------------------------------------
 // Define a route for adding a new client
-app.post(
-  "/clientes",
-  // upload.single("cl_photo"),
-  (req, res) => {
-    console.log(req.files.foo);
-    const { cl_nombre, cl_cedula, cl_celular } = req.body;
 
-    let cl_photo;
-    if (req.file) {
-      cl_photo = uploadImage(req.files.cl_photo.tempFilePath);
-      // cl_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
+// app.post("/clientes", upload.single("cl_photo"), (req, res) => {
+//   const { cl_nombre, cl_cedula, cl_celular } = req.body;
+
+//   let cl_photo;
+//   if (req.file) {
+//     cl_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
+//   }
+
+//   const newcliente = { cl_nombre, cl_cedula, cl_celular };
+
+//   if (cl_photo) {
+//     newcliente.cl_photo = cl_photo;
+//   }
+
+//   db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
+//     if (err) {
+//       console.error("Error adding cliente to MySQL database: " + err.stack);
+//       return res.status(500).send("Error adding cliente to database");
+//     }
+//     return res.send("cliente added to database with ID " + result.insertId);
+//   });
+// });
+
+//----------------------------------------------------------------------------------
+//nuevo post
+
+app.post("/clientes", async (req, res) => {
+  const { cl_nombre, cl_cedula, cl_celular } = req.body;
+
+  let cl_photo;
+  if (req.files && req.files.cl_photo) {
+    try {
+      const imageInfo = await uploadImage(req.files.cl_photo.tempFilePath);
+      cl_photo = imageInfo.secure_url;
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary: " + error);
+      return res.status(500).send("Error uploading image to Cloudinary");
     }
-
-    const newcliente = { cl_nombre, cl_cedula, cl_celular };
-
-    if (cl_photo) {
-      newcliente.cl_photo = cl_photo;
-    }
-
-    db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
-      if (err) {
-        console.error("Error adding cliente to MySQL database: " + err.stack);
-        return res.status(500).send("Error adding cliente to database");
-      }
-      return res.send("cliente added to database with ID " + result.insertId);
-    });
   }
-);
+
+  const newcliente = { cl_nombre, cl_cedula, cl_celular, cl_photo };
+
+  db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
+    if (err) {
+      console.error("Error adding cliente to MySQL database: " + err.stack);
+      return res.status(500).send("Error adding cliente to database");
+    }
+    return res.send("cliente added to database with ID " + result.insertId);
+  });
+});
 
 //POST EMPLEADOS----------------------------------------------------------------
 app.post(
