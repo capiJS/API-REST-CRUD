@@ -1,14 +1,30 @@
-import { DB_HOST, DB_NAME, DB_PASSW0RD, DB_PORT, DB_USER } from "./config.js";
+import {
+  DB_HOST,
+  DB_NAME,
+  DB_PASSW0RD,
+  DB_PORT,
+  DB_USER,
+  RAILWAY_IMAGE_URL,
+} from "./config.js";
 import express from "express";
 import bodyParser from "body-parser";
 import mysql2 from "mysql2";
 import cors from "cors";
 import multer from "multer";
 import { PORT } from "./config.js";
+import fileUpload from "express-fileupload";
+import { uploadImage } from "./cloudinary.js";
 
 const app = express();
 
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
+
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "./uploads",
+  })
+);
 
 // Create connection to MySQL database
 
@@ -30,23 +46,23 @@ db.connect((err) => {
 });
 
 // Set up multer storage configuration for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads/");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
 
-// Create multer instance with the storage configuration
-const upload = multer({ storage });
+// // Create multer instance with the storage configuration
+// const upload = multer({ storage });
 
 app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(
   cors({
-    "Access-Control-Allow-Origin": `https://api-rest-crud-production.up.railway.app/`,
+    "Access-Control-Allow-Origin": `http://${DB_HOST}:${PORT}/`,
   })
 );
 
@@ -108,55 +124,62 @@ app.get("/pagos", (req, res) => {
 
 //POST CLIENTES----------------------------------------------------------------
 // Define a route for adding a new client
-app.post("/clientes", upload.single("cl_photo"), (req, res) => {
-  const { cl_nombre, cl_cedula, cl_celular } = req.body;
+app.post(
+  "/clientes",
+  // upload.single("cl_photo"),
+  (req, res) => {
+    console.log(req.files.foo);
+    const { cl_nombre, cl_cedula, cl_celular } = req.body;
 
-  let cl_photo;
-  if (req.file) {
-    cl_photo =
-      "https://api-rest-crud-production.up.railway.app" +
-      // "/uploads" +
-      req.file.filename; // Get the filename of the newCliente photo
-  }
-
-  const newcliente = { cl_nombre, cl_cedula, cl_celular };
-
-  if (cl_photo) {
-    newcliente.cl_photo = cl_photo;
-  }
-
-  db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
-    if (err) {
-      console.error("Error adding cliente to MySQL database: " + err.stack);
-      return res.status(500).send("Error adding cliente to database");
+    let cl_photo;
+    if (req.file) {
+      cl_photo = uploadImage(req.files.cl_photo.tempFilePath);
+      // cl_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
     }
-    return res.send("cliente added to database with ID " + result.insertId);
-  });
-});
+
+    const newcliente = { cl_nombre, cl_cedula, cl_celular };
+
+    if (cl_photo) {
+      newcliente.cl_photo = cl_photo;
+    }
+
+    db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
+      if (err) {
+        console.error("Error adding cliente to MySQL database: " + err.stack);
+        return res.status(500).send("Error adding cliente to database");
+      }
+      return res.send("cliente added to database with ID " + result.insertId);
+    });
+  }
+);
 
 //POST EMPLEADOS----------------------------------------------------------------
-app.post("/empleados", upload.single("em_photo"), (req, res) => {
-  const { em_nombre, em_cedula, em_celular } = req.body;
+app.post(
+  "/empleados",
+  // upload.single("em_photo"),
+  (req, res) => {
+    const { em_nombre, em_cedula, em_celular } = req.body;
 
-  let em_photo;
-  if (req.file) {
-    em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename; // Get the filename of the newCliente photo
-  }
-
-  const newempleado = { em_nombre, em_cedula, em_celular };
-
-  if (em_photo) {
-    newempleado.em_photo = em_photo;
-  }
-
-  db.query("INSERT INTO empleados SET ?", newempleado, (err, result) => {
-    if (err) {
-      console.error("Error adding cliente to MySQL database: " + err.stack);
-      return res.status(500).send("Error adding cliente to database");
+    let em_photo;
+    if (req.file) {
+      em_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
     }
-    return res.send("cliente added to database with ID " + result.insertId);
-  });
-});
+
+    const newempleado = { em_nombre, em_cedula, em_celular };
+
+    if (em_photo) {
+      newempleado.em_photo = em_photo;
+    }
+
+    db.query("INSERT INTO empleados SET ?", newempleado, (err, result) => {
+      if (err) {
+        console.error("Error adding cliente to MySQL database: " + err.stack);
+        return res.status(500).send("Error adding cliente to database");
+      }
+      return res.send("cliente added to database with ID " + result.insertId);
+    });
+  }
+);
 
 //------------------------------------------------------------------------------
 
@@ -190,69 +213,77 @@ app.get("/clientes/:cl_id", (req, res) => {
 
 //Define a route for updating a user by their ID
 
-app.put("/clientes/:cl_id", upload.single("cl_photo"), (req, res) => {
-  const id = req.params.cl_id;
-  const { cl_nombre, cl_cedula, cl_celular } = req.body;
+app.put(
+  "/clientes/:cl_id",
+  // upload.single("cl_photo"),
+  (req, res) => {
+    const id = req.params.cl_id;
+    const { cl_nombre, cl_cedula, cl_celular } = req.body;
 
-  let cl_photo;
-  if (req.file) {
-    cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
-  }
-
-  const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
-
-  if (cl_photo) {
-    updatedCliente.cl_photo = cl_photo;
-  }
-
-  db.query(
-    "UPDATE clientes SET ? WHERE cl_id = ?",
-    [updatedCliente, id],
-    (err, result) => {
-      if (err) {
-        console.error("Error updating user in MySQL database: " + err.stack);
-        return res.status(500).send("Error updating user in database");
-      }
-      if (result.affectedRows === 0) {
-        return res.status(404).send("User not found");
-      }
-      return res.send("cliente updated in clientes");
+    let cl_photo;
+    if (req.file) {
+      cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
     }
-  );
-});
+
+    const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
+
+    if (cl_photo) {
+      updatedCliente.cl_photo = cl_photo;
+    }
+
+    db.query(
+      "UPDATE clientes SET ? WHERE cl_id = ?",
+      [updatedCliente, id],
+      (err, result) => {
+        if (err) {
+          console.error("Error updating user in MySQL database: " + err.stack);
+          return res.status(500).send("Error updating user in database");
+        }
+        if (result.affectedRows === 0) {
+          return res.status(404).send("User not found");
+        }
+        return res.send("cliente updated in clientes");
+      }
+    );
+  }
+);
 
 //PUT EMPLEADOS --------------------------------------------------------------
 
-app.put("/empleados/:em_id", upload.single("em_photo"), (req, res) => {
-  const id = req.params.em_id;
-  const { em_nombre, em_cedula, em_celular } = req.body;
+app.put(
+  "/empleados/:em_id",
+  // upload.single("em_photo"),
+  (req, res) => {
+    const id = req.params.em_id;
+    const { em_nombre, em_cedula, em_celular } = req.body;
 
-  let em_photo;
-  if (req.file) {
-    em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename;
-  }
-
-  const updatedEmpleado = { em_nombre, em_cedula, em_celular };
-
-  if (em_photo) {
-    updatedEmpleado.em_photo = em_photo;
-  }
-
-  db.query(
-    "UPDATE empleados SET ? WHERE em_id = ?",
-    [updatedEmpleado, id],
-    (err, result) => {
-      if (err) {
-        console.error("Error updating user in MySQL database: " + err.stack);
-        return res.status(500).send("Error updating user in database");
-      }
-      if (result.affectedRows === 0) {
-        return res.status(404).send("User not found");
-      }
-      return res.send("empleado updated in clientes");
+    let em_photo;
+    if (req.file) {
+      em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename;
     }
-  );
-});
+
+    const updatedEmpleado = { em_nombre, em_cedula, em_celular };
+
+    if (em_photo) {
+      updatedEmpleado.em_photo = em_photo;
+    }
+
+    db.query(
+      "UPDATE empleados SET ? WHERE em_id = ?",
+      [updatedEmpleado, id],
+      (err, result) => {
+        if (err) {
+          console.error("Error updating user in MySQL database: " + err.stack);
+          return res.status(500).send("Error updating user in database");
+        }
+        if (result.affectedRows === 0) {
+          return res.status(404).send("User not found");
+        }
+        return res.send("empleado updated in clientes");
+      }
+    );
+  }
+);
 
 //----------------------------------------------------------------------------
 
