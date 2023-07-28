@@ -159,6 +159,7 @@ app.post("/clientes", async (req, res) => {
     try {
       const imageInfo = await uploadImage(req.files.cl_photo.tempFilePath);
       cl_photo = imageInfo.secure_url;
+      console.log("Cloudinary Image Info:", imageInfo);
     } catch (error) {
       console.error("Error uploading image to Cloudinary: " + error);
       return res.status(500).send("Error uploading image to Cloudinary");
