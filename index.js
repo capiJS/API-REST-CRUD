@@ -14,6 +14,7 @@ import multer from "multer";
 import { PORT } from "./config.js";
 import fileUpload from "express-fileupload";
 import { uploadImage } from "./cloudinary.js";
+import { deleteImage } from "./cloudinary.js";
 
 const app = express();
 
@@ -322,16 +323,26 @@ app.put(
 // Define a route for deleting a cliente by their ID
 app.delete("/clientes/:cl_id", (req, res) => {
   const id = req.params.cl_id;
-  db.query("DELETE FROM clientes WHERE cl_id = ?", id, (err, result) => {
-    if (err) {
-      console.error("Error deleting cliente from MySQL database: " + err.stack);
-      return res.status(500).send("Error deleting cliente from database");
+  const cl_photo = req.params.cl_photo;
+
+  db.query(
+    "DELETE FROM clientes WHERE cl_id = ?",
+    id,
+    cl_photo,
+    async (err, result) => {
+      if (err) {
+        console.error(
+          "Error deleting cliente from MySQL database: " + err.stack
+        );
+        return res.status(500).send("Error deleting cliente from database");
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).send("cliente not found");
+      }
+      await deleteImage(cl.photo.public_id);
+      return res.send("cliente deleted from database");
     }
-    if (result.affectedRows === 0) {
-      return res.status(404).send("cliente not found");
-    }
-    return res.send("cliente deleted from database");
-  });
+  );
 });
 
 //DELETE EMPLEADOS---------------------------------------------------------------
