@@ -321,15 +321,14 @@ app.put(
 // });
 
 // Define a route for deleting a cliente by their ID
-
 app.delete("/clientes/:cl_id", async (req, res) => {
   const id = req.params.cl_id;
 
-  // Primero, obtenemos la información del cliente para obtener el public_id de la imagen
+  // Step 1: Get the image URL from the database
   db.query(
     "SELECT cl_photo FROM clientes WHERE cl_id = ?",
     id,
-    async (err, result) => {
+    async (err, results) => {
       if (err) {
         console.error(
           "Error getting cliente from MySQL database: " + err.stack
@@ -337,43 +336,40 @@ app.delete("/clientes/:cl_id", async (req, res) => {
         return res.status(500).send("Error getting cliente from database");
       }
 
-      if (result.length === 0) {
-        return res.status(404).send("Cliente not found");
+      if (results.length === 0) {
+        return res.status(404).send("cliente not found");
       }
 
-      const cliente = result[0];
+      const imageUrl = results[0].cl_photo;
 
-      // Verificamos si hay una imagen asociada al cliente antes de eliminarlo
-      if (cliente.cl_photo) {
-        const imageUrlParts = cliente.cl_photo.split("/");
-        const publicId = imageUrlParts[imageUrlParts.length - 1].split(".")[0];
-
-        try {
-          // Eliminamos la imagen de Cloudinary antes de eliminar el cliente de la base de datos
-          await deleteImage(publicId);
-          console.log("Image deleted from Cloudinary:", publicId);
-        } catch (error) {
-          console.error("Error deleting image from Cloudinary: " + error);
-          return res.status(500).send("Error deleting image from Cloudinary");
-        }
-      }
-
-      // Si no hay error en la eliminación de la imagen o si no hay imagen asociada,
-      // procedemos a eliminar el cliente de la base de datos
+      // Step 2: Delete the cliente from the database
       db.query(
         "DELETE FROM clientes WHERE cl_id = ?",
         id,
-        (err, deleteResult) => {
+        async (err, result) => {
           if (err) {
             console.error(
               "Error deleting cliente from MySQL database: " + err.stack
             );
             return res.status(500).send("Error deleting cliente from database");
           }
-          if (deleteResult.affectedRows === 0) {
-            return res.status(404).send("Cliente not found");
+
+          if (result.affectedRows === 0) {
+            return res.status(404).send("cliente not found");
           }
-          return res.send("Cliente deleted from database");
+
+          // Step 3: Extract the public_id from the image URL
+          const publicId = imageUrl.split("/").pop().split(".")[0];
+
+          // Step 4: Call the deleteImage function to remove the image from Cloudinary
+          try {
+            await deleteImage(publicId);
+          } catch (error) {
+            console.error("Error deleting image from Cloudinary: " + error);
+            return res.status(500).send("Error deleting image from Cloudinary");
+          }
+
+          return res.send("cliente deleted from database");
         }
       );
     }
