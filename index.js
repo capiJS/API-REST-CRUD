@@ -321,20 +321,52 @@ app.put(
 // });
 
 // Define a route for deleting a cliente by their ID
-app.delete("/clientes/:cl_id", (req, res) => {
+app.delete("/clientes/:cl_id", async (req, res) => {
   const id = req.params.cl_id;
 
-  db.query("DELETE FROM clientes WHERE cl_id = ?", id, (err, result) => {
-    if (err) {
-      console.error("Error deleting cliente from MySQL database: " + err.stack);
-      return res.status(500).send("Error deleting cliente from database");
+  db.query(
+    "SELECT cl_photo FROM clientes WHERE cl_id = ?",
+    id,
+    async (err, results) => {
+      if (err) {
+        console.error(
+          "Error deleting cliente from MySQL database: " + err.stack
+        );
+        return res.status(500).send("Error deleting cliente from database");
+      }
+      if (results.length === 0) {
+        return res.status(404).send("cliente not found");
+      }
+      console.log(results);
+      const cl_photo = results[0].cl_photo;
+
+      db.query(
+        "DELETE FROM clientes WHERE cl_id = ?",
+        id,
+        async (err, result) => {
+          if (err) {
+            console.error(
+              "Error deleting cliente from MySQL database: " + err.stack
+            );
+            return res.status(500).send("Error deleting cliente from database");
+          }
+          if (result.affectedRows === 0) {
+            return res.status(404).send("cliente not found");
+          }
+
+          try {
+            // Call the deleteImage function to remove the image from Cloudinary
+            await deleteImage(cl_photo);
+          } catch (error) {
+            console.error("Error deleting image from Cloudinary: " + error);
+            return res.status(500).send("Error deleting image from Cloudinary");
+          }
+
+          return res.send("cliente deleted from database");
+        }
+      );
     }
-    if (result.affectedRows === 0) {
-      return res.status(404).send("cliente not found");
-    }
-    // await deleteImage(cl.photo.public_id);
-    return res.send("cliente deleted from database");
-  });
+  );
 });
 
 //DELETE EMPLEADOS---------------------------------------------------------------
