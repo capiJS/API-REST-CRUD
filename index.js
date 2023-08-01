@@ -345,10 +345,11 @@ app.delete("/clientes/:cl_id", async (req, res) => {
       const cliente = results[0];
       const cloudinaryUrl = cliente.cl_photo;
 
-      // Extraer el public_id de la URL de Cloudinary
       const publicId = extractPublicIdFromUrl(cloudinaryUrl);
+
+      console.log("Public ID:", publicId);
+
       if (publicId) {
-        // Eliminar la imagen de Cloudinary
         try {
           await deleteImage(publicId);
         } catch (error) {
