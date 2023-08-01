@@ -338,7 +338,7 @@ app.delete("/clientes/:cl_id", async (req, res) => {
         return res.status(404).send("cliente not found");
       }
       console.log(results);
-      const cl_photo = results[0].cl_photo;
+      // const cl_photo = results[0].cl_photo;
 
       db.query(
         "DELETE FROM clientes WHERE cl_id = ?",
