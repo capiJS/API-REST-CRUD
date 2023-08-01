@@ -19,3 +19,16 @@ export async function uploadImage(filePath) {
 export async function deleteImage(publicId) {
   return await cloudinary.uploader.destroy(publicId);
 }
+
+// funcion para extraer public_id
+
+export function extractPublicIdFromUrl(cloudinaryUrl) {
+  const startIndex = cloudinaryUrl.indexOf("upload/") + 7;
+  const endIndex = cloudinaryUrl.lastIndexOf(".");
+
+  if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
+    return cloudinaryUrl.slice(startIndex, endIndex);
+  }
+
+  return null; // Si no se pudo extraer el public_id, retornamos null
+}
