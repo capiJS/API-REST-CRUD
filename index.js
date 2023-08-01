@@ -338,7 +338,8 @@ app.delete("/clientes/:cl_id", async (req, res) => {
         return res.status(404).send("cliente not found");
       }
 
-      const cl_photo = results.cl_photo;
+      const cl_photo = results[0].cl_photo;
+      const public_id = cl_photo.split("/uploads/")[1]; // Extract public_id from the URL
 
       db.query(
         "DELETE FROM clientes WHERE cl_id = ?",
@@ -356,7 +357,7 @@ app.delete("/clientes/:cl_id", async (req, res) => {
 
           try {
             // Call the deleteImage function to remove the image from Cloudinary
-            await deleteImage(cl_photo);
+            await deleteImage(public_id);
           } catch (error) {
             console.error("Error deleting image from Cloudinary: " + error);
             return res.status(500).send("Error deleting image from Cloudinary");
