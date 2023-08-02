@@ -23,7 +23,7 @@ export async function deleteImage(publicId) {
 // funcion para extraer public_id
 
 export function extractPublicIdFromUrl(cloudinaryUrl) {
-  const startIndex = cloudinaryUrl.indexOf("uploads/") + 8;
+  const startIndex = cloudinaryUrl.indexOf("uploads/");
   const endIndex = cloudinaryUrl.lastIndexOf(".");
 
   if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
