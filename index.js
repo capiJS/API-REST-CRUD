@@ -197,40 +197,39 @@ app.get("/clientes/:cl_id", (req, res) => {
 
 //Define a route for updating a user by their ID
 
-app.put(
-  "/clientes/:cl_id",
-  // upload.single("cl_photo"),
-  (req, res) => {
-    const id = req.params.cl_id;
-    const { cl_nombre, cl_cedula, cl_celular } = req.body;
+app.put("/clientes/:cl_id", async (req, res) => {
+  const id = req.params.cl_id;
+  const { cl_nombre, cl_cedula, cl_celular } = req.body;
 
-    let cl_photo;
-    if (req.file) {
-      cl_photo = "http://localhost:4000/uploads/" + req.file.filename;
+  let cl_photo;
+  if (req.files && req.files.cl_photo) {
+    try {
+      const imageInfo = await uploadImage(req.files.cl_photo.tempFilePath);
+      cl_photo = imageInfo.secure_url;
+      console.log("Cloudinary Image Info:", imageInfo);
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary: " + error);
+      return res.status(500).send("Error uploading image to Cloudinary");
     }
-
-    const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
-
-    if (cl_photo) {
-      updatedCliente.cl_photo = cl_photo;
-    }
-
-    db.query(
-      "UPDATE clientes SET ? WHERE cl_id = ?",
-      [updatedCliente, id],
-      (err, result) => {
-        if (err) {
-          console.error("Error updating user in MySQL database: " + err.stack);
-          return res.status(500).send("Error updating user in database");
-        }
-        if (result.affectedRows === 0) {
-          return res.status(404).send("User not found");
-        }
-        return res.send("cliente updated in clientes");
-      }
-    );
   }
-);
+
+  const newcliente = { cl_nombre, cl_cedula, cl_celular, cl_photo };
+
+  db.query(
+    "UPDATE clientes SET ? WHERE cl_id = ?",
+    [updatedCliente, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user in MySQL database: " + err.stack);
+        return res.status(500).send("Error updating user in database");
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).send("User not found");
+      }
+      return res.send("cliente updated in clientes");
+    }
+  );
+});
 
 //PUT EMPLEADOS --------------------------------------------------------------
 
