@@ -217,8 +217,7 @@ app.put("/clientes/:cl_id", async (req, res) => {
 
   db.query(
     "UPDATE clientes SET ? WHERE cl_id = ?",
-    updatedCliente,
-    id,
+    [updatedCliente, id],
     (err, result) => {
       if (err) {
         console.error("Error updating user in MySQL database: " + err.stack);
