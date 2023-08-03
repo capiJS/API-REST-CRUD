@@ -20,8 +20,6 @@ export async function deleteImage(publicId) {
   return await cloudinary.uploader.destroy(publicId);
 }
 
-// funcion para extraer public_id
-
 export function extractPublicIdFromUrl(cloudinaryUrl) {
   const startIndex = cloudinaryUrl.indexOf("uploads/");
   const endIndex = cloudinaryUrl.lastIndexOf(".");

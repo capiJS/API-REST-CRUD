@@ -4,7 +4,7 @@ import {
   DB_PASSW0RD,
   DB_PORT,
   DB_USER,
-  RAILWAY_IMAGE_URL,
+  URL_API,
 } from "./config.js";
 import express from "express";
 import bodyParser from "body-parser";
@@ -66,7 +66,7 @@ app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(
   cors({
-    "Access-Control-Allow-Origin": `http://${DB_HOST}:${PORT}/`,
+    "Access-Control-Allow-Origin": URL_API,
   })
 );
 
@@ -108,52 +108,8 @@ app.get("/pagos", (req, res) => {
   });
 });
 
-//---------------------------------------------------------------------------------
-
-// app.get("/traerproductos", (request, response) => {
-//   // Podemos acceder a la petición HTTP
-//   const params = request.query;
-//   const respuesta = {
-//     productos: [
-//       {
-//         id: 1,
-//         camiseta: "blanca",
-//       },
-//       { id: 2, camiseta: "negra" },
-//     ],
-//   };
-//   console.log("imprimiendo params", params);
-//   response.status(200).send({ message: "GET OK", data: respuesta, params });
-// });
-
 //POST CLIENTES----------------------------------------------------------------
 // Define a route for adding a new client
-
-// app.post("/clientes", upload.single("cl_photo"), (req, res) => {
-//   const { cl_nombre, cl_cedula, cl_celular } = req.body;
-
-//   let cl_photo;
-//   if (req.file) {
-//     cl_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
-//   }
-
-//   const newcliente = { cl_nombre, cl_cedula, cl_celular };
-
-//   if (cl_photo) {
-//     newcliente.cl_photo = cl_photo;
-//   }
-
-//   db.query("INSERT INTO clientes SET ?", newcliente, (err, result) => {
-//     if (err) {
-//       console.error("Error adding cliente to MySQL database: " + err.stack);
-//       return res.status(500).send("Error adding cliente to database");
-//     }
-//     return res.send("cliente added to database with ID " + result.insertId);
-//   });
-// });
-
-//----------------------------------------------------------------------------------
-//nuevo post
 
 app.post("/clientes", async (req, res) => {
   const { cl_nombre, cl_cedula, cl_celular } = req.body;
@@ -182,32 +138,32 @@ app.post("/clientes", async (req, res) => {
 });
 
 //POST EMPLEADOS----------------------------------------------------------------
-app.post(
-  "/empleados",
-  // upload.single("em_photo"),
-  (req, res) => {
-    const { em_nombre, em_cedula, em_celular } = req.body;
 
-    let em_photo;
-    if (req.file) {
-      em_photo = `${RAILWAY_IMAGE_URL}` + "uploads" + req.file.filename; // Get the filename of the newCliente photo
+app.post("/empleados", async (req, res) => {
+  const { em_nombre, em_cedula, em_celular } = req.body;
+
+  let em_photo;
+  if (req.files && req.files.em_photo) {
+    try {
+      const imageInfo = await uploadImage(req.files.em_photo.tempFilePath);
+      em_photo = imageInfo.secure_url;
+      console.log("Cloudinary Image Info:", imageInfo);
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary: " + error);
+      return res.status(500).send("Error uploading image to Cloudinary");
     }
-
-    const newempleado = { em_nombre, em_cedula, em_celular };
-
-    if (em_photo) {
-      newempleado.em_photo = em_photo;
-    }
-
-    db.query("INSERT INTO empleados SET ?", newempleado, (err, result) => {
-      if (err) {
-        console.error("Error adding cliente to MySQL database: " + err.stack);
-        return res.status(500).send("Error adding cliente to database");
-      }
-      return res.send("cliente added to database with ID " + result.insertId);
-    });
   }
-);
+
+  const newempleado = { em_nombre, em_cedula, em_celular, em_photo };
+
+  db.query("INSERT INTO empleados SET ?", newempleado, (err, result) => {
+    if (err) {
+      console.error("Error adding empleado to MySQL database: " + err.stack);
+      return res.status(500).send("Error adding empleado to database");
+    }
+    return res.send("empleado added to database with ID " + result.insertId);
+  });
+});
 
 //------------------------------------------------------------------------------
 
