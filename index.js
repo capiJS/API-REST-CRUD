@@ -233,40 +233,39 @@ app.put("/clientes/:cl_id", async (req, res) => {
 
 //PUT EMPLEADOS --------------------------------------------------------------
 
-app.put(
-  "/empleados/:em_id",
-  // upload.single("em_photo"),
-  (req, res) => {
-    const id = req.params.em_id;
-    const { em_nombre, em_cedula, em_celular } = req.body;
+app.put("/empleados/:em_id", async (req, res) => {
+  const id = req.params.em_id;
+  const { em_nombre, em_cedula, em_celular } = req.body;
 
-    let em_photo;
-    if (req.file) {
-      em_photo = `http://${DB_HOST}:${PORT}/uploads/` + req.file.filename;
+  let em_photo;
+  if (req.files && req.files.em_photo) {
+    try {
+      const imageInfo = await uploadImage(req.files.em_photo.tempFilePath);
+      em_photo = imageInfo.secure_url;
+      console.log("Cloudinary Image Info:", imageInfo);
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary: " + error);
+      return res.status(500).send("Error uploading image to Cloudinary");
     }
-
-    const updatedEmpleado = { em_nombre, em_cedula, em_celular };
-
-    if (em_photo) {
-      updatedEmpleado.em_photo = em_photo;
-    }
-
-    db.query(
-      "UPDATE empleados SET ? WHERE em_id = ?",
-      [updatedEmpleado, id],
-      (err, result) => {
-        if (err) {
-          console.error("Error updating user in MySQL database: " + err.stack);
-          return res.status(500).send("Error updating user in database");
-        }
-        if (result.affectedRows === 0) {
-          return res.status(404).send("User not found");
-        }
-        return res.send("empleado updated in clientes");
-      }
-    );
   }
-);
+
+  const updatedempleado = { em_nombre, em_cedula, em_celular, em_photo };
+
+  db.query(
+    "UPDATE empleados SET ? WHERE em_id = ?",
+    [updatedempleado, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user in MySQL database: " + err.stack);
+        return res.status(500).send("Error updating user in database");
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).send("User not found");
+      }
+      return res.send("empleado updated in empleados");
+    }
+  );
+});
 
 //----------------------------------------------------------------------------
 
