@@ -66,8 +66,7 @@ app.use(bodyParser.urlencoded({ extended: false, limit: "10mb" }));
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(
   cors({
-    "Access-Control-Allow-Origin":
-      "https://api-rest-crud-production.up.railway.app",
+    "Access-Control-Allow-Origin": URL_API,
   })
 );
 
