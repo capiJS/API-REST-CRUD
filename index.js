@@ -277,6 +277,7 @@ app.put("/empleados/:em_id", async (req, res) => {
 //   reponse.status(200).send("PUT ID OK");
 // });
 
+//DELETE CLIENTES--------------------------------------------------------------
 // Define a route for deleting a cliente by their ID
 app.delete("/clientes/:cl_id", async (req, res) => {
   const id = req.params.cl_id;
@@ -332,18 +333,57 @@ app.delete("/clientes/:cl_id", async (req, res) => {
 });
 
 //DELETE EMPLEADOS---------------------------------------------------------------
-app.delete("/empleados/:em_id", (req, res) => {
+app.delete("/empleados/:em_id", async (req, res) => {
   const id = req.params.em_id;
-  db.query("DELETE FROM empleados WHERE em_id = ?", id, (err, result) => {
-    if (err) {
-      console.error("Error deleting cliente from MySQL database: " + err.stack);
-      return res.status(500).send("Error deleting cliente from database");
+
+  // Obtener el empleado por su ID
+  db.query(
+    "SELECT * FROM empleados WHERE em_id = ?",
+    id,
+    async (err, results) => {
+      if (err) {
+        console.error(
+          "Error getting empleado from MySQL database: " + err.stack
+        );
+        return res.status(500).send("Error getting empleado from database");
+      }
+      if (results.length === 0) {
+        return res.status(404).send("empleado not found");
+      }
+
+      const empleado = results[0];
+      const cloudinaryUrl = empleado.em_photo;
+
+      const publicId = extractPublicIdFromUrl(cloudinaryUrl);
+
+      console.log("Public ID:", publicId);
+
+      if (publicId) {
+        try {
+          await deleteImage(publicId);
+        } catch (error) {
+          console.error("Error deleting image from Cloudinary: " + error);
+          return res.status(500).send("Error deleting image from Cloudinary");
+        }
+      }
+
+      // Eliminar el empleado de la base de datos
+      db.query("DELETE FROM empleados WHERE em_id = ?", id, (err, result) => {
+        if (err) {
+          console.error(
+            "Error deleting empleado from MySQL database: " + err.stack
+          );
+          return res.status(500).send("Error deleting empleado from database");
+        }
+        if (result.affectedRows === 0) {
+          return res.status(404).send("empleado not found");
+        }
+        return res.send(
+          "empleado and associated image deleted from database and Cloudinary"
+        );
+      });
     }
-    if (result.affectedRows === 0) {
-      return res.status(404).send("cliente not found");
-    }
-    return res.send("empleado deleted from database");
-  });
+  );
 });
 //-------------------------------------------------------------------------------
 
