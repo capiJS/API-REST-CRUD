@@ -213,7 +213,11 @@ app.put("/clientes/:cl_id", async (req, res) => {
     }
   }
 
-  const updatedCliente = { cl_nombre, cl_cedula, cl_celular, cl_photo };
+  const updatedCliente = { cl_nombre, cl_cedula, cl_celular };
+
+  if (cl_photo) {
+    updatedCliente.cl_photo = cl_photo;
+  }
 
   db.query(
     "UPDATE clientes SET ? WHERE cl_id = ?",
