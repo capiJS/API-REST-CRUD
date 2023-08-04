@@ -253,7 +253,11 @@ app.put("/empleados/:em_id", async (req, res) => {
     }
   }
 
-  const updatedempleado = { em_nombre, em_cedula, em_celular, em_photo };
+  const updatedempleado = { em_nombre, em_cedula, em_celular };
+
+  if (em_photo) {
+    updatedempleado.em_photo = em_photo;
+  }
 
   db.query(
     "UPDATE empleados SET ? WHERE em_id = ?",
