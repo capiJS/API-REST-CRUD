@@ -32,7 +32,7 @@ app.use(
 
 // Create connection to MySQL database
 
-const db = mysql2.createConnection({
+const db = mysql2.createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSW0RD,
@@ -41,12 +41,13 @@ const db = mysql2.createConnection({
 });
 
 // Connect to MySQL database
-db.connect((err) => {
+db.getConnection((err, connection) => {
   if (err) {
     console.error("Error connecting to MySQL database: " + err.stack);
     return;
   }
-  console.log("Connected to MySQL database with ID " + db.threadId);
+  console.log("Connected to MySQL database with ID " + connection.threadId);
+  connection.release(); // Release the connection back to the pool after connecting
 });
 
 // Set up multer storage configuration for file uploads
@@ -74,38 +75,37 @@ app.use(
 // ORDER by cl_id desc - this could be place after clientes
 
 //GET CLIENTES---------------------------------------------------------------------
-app.get("/clientes", (req, res) => {
-  db.query("SELECT * FROM clientes ", (err, results) => {
-    if (err) {
-      console.error("Error getting clientes from MySQL database: " + err.stack);
-      return res.status(500).send("Error getting clientes from database");
-    }
+app.get("/clientes", async (req, res) => {
+  try {
+    const results = await executeQuery("SELECT * FROM clientes");
     return res.json(results);
-  });
+  } catch (err) {
+    console.error("Error getting clientes from MySQL database: " + err.stack);
+    return res.status(500).send("Error getting clientes from database");
+  }
 });
 
 //GET EMPLEADOS--------------------------------------------------------------------
-app.get("/empleados", (req, res) => {
-  db.query("SELECT * FROM empleados ", (err, results) => {
-    if (err) {
-      console.error(
-        "Error getting empleados from MySQL database: " + err.stack
-      );
-      return res.status(500).send("Error getting empleados from database");
-    }
+app.get("/empleados", async (req, res) => {
+  try {
+    const results = await executeQuery("SELECT * FROM empleados");
     return res.json(results);
-  });
+  } catch (err) {
+    console.error("Error getting empleados from MySQL database: " + err.stack);
+    return res.status(500).send("Error getting empleados from database");
+  }
 });
 
 //GET PAGOS--------------------------------------------------------------------
-app.get("/pagos", (req, res) => {
-  db.query("SELECT * FROM pagos ", (err, results) => {
-    if (err) {
-      console.error("Error getting pagos from MySQL database: " + err.stack);
-      return res.status(500).send("Error getting pagos from database");
-    }
+
+app.get("/pagos", async (req, res) => {
+  try {
+    const results = await executeQuery("SELECT * FROM pagos");
     return res.json(results);
-  });
+  } catch (err) {
+    console.error("Error getting pagos from MySQL database: " + err.stack);
+    return res.status(500).send("Error getting pagos from database");
+  }
 });
 
 //POST CLIENTES----------------------------------------------------------------
@@ -400,6 +400,17 @@ app.delete("/empleados/:em_id", async (req, res) => {
 //   console.log("id", id);
 //   reponse.status(200).send("DELETE  OK");
 // });
+
+function executeQuery(sql) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, results) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(results);
+    });
+  });
+}
 
 // prueba puerto run
 app.listen(PORT, (err) => {
