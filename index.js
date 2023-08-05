@@ -77,10 +77,21 @@ app.use(
 //GET CLIENTES---------------------------------------------------------------------
 app.get("/clientes", async (req, res) => {
   try {
-    const results = await executeQuery("SELECT * FROM clientes");
+    const results = await new Promise((resolve, reject) => {
+      db.query("SELECT * FROM clientes", (err, results) => {
+        if (err) {
+          console.error(
+            "Error getting clientes from MySQL database: " + err.stack
+          );
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+
     return res.json(results);
-  } catch (err) {
-    console.error("Error getting clientes from MySQL database: " + err.stack);
+  } catch (error) {
     return res.status(500).send("Error getting clientes from database");
   }
 });
@@ -88,10 +99,21 @@ app.get("/clientes", async (req, res) => {
 //GET EMPLEADOS--------------------------------------------------------------------
 app.get("/empleados", async (req, res) => {
   try {
-    const results = await executeQuery("SELECT * FROM empleados");
+    const results = await new Promise((resolve, reject) => {
+      db.query("SELECT * FROM empleados", (err, results) => {
+        if (err) {
+          console.error(
+            "Error getting empleados from MySQL database: " + err.stack
+          );
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+
     return res.json(results);
-  } catch (err) {
-    console.error("Error getting empleados from MySQL database: " + err.stack);
+  } catch (error) {
     return res.status(500).send("Error getting empleados from database");
   }
 });
@@ -100,10 +122,21 @@ app.get("/empleados", async (req, res) => {
 
 app.get("/pagos", async (req, res) => {
   try {
-    const results = await executeQuery("SELECT * FROM pagos");
+    const results = await new Promise((resolve, reject) => {
+      db.query("SELECT * FROM pagos", (err, results) => {
+        if (err) {
+          console.error(
+            "Error getting pagos from MySQL database: " + err.stack
+          );
+          reject(err);
+        } else {
+          resolve(results);
+        }
+      });
+    });
+
     return res.json(results);
-  } catch (err) {
-    console.error("Error getting pagos from MySQL database: " + err.stack);
+  } catch (error) {
     return res.status(500).send("Error getting pagos from database");
   }
 });
@@ -400,17 +433,6 @@ app.delete("/empleados/:em_id", async (req, res) => {
 //   console.log("id", id);
 //   reponse.status(200).send("DELETE  OK");
 // });
-
-function executeQuery(sql) {
-  return new Promise((resolve, reject) => {
-    db.query(sql, (err, results) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve(results);
-    });
-  });
-}
 
 // prueba puerto run
 app.listen(PORT, (err) => {
