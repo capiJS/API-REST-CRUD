@@ -70,6 +70,13 @@ app.use(
     origin: [URL_API],
   })
 );
+app.use(
+  cors({
+    origin: "https://capijs.github.io", // Change this to your specific origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // If you are using credentials (e.g., cookies) in your requests
+  })
+);
 
 // Define a route for getting all clients
 // ORDER by cl_id desc - this could be place after clientes
