@@ -68,9 +68,9 @@ app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use(
   cors({
-    origin: [URL_API], // Change this to your specific origin
+    origin: "https://capijs.github.io",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true, // If you are using credentials (e.g., cookies) in your requests
+    credentials: true, // Si estás usando cookies en tus solicitudes
   })
 );
 
