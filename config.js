@@ -7,4 +7,7 @@ export const DB_PORT = process.env.DB_PORT || "3306";
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
-export const URL_API = "https://capijs.github.io" || "http://localhost:4000";
+export const URL_API =
+  "https://api-rest-crud-production.up.railway.app/https://capijs.github.io";
+// ||
+// "http://localhost:4000";
