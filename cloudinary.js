@@ -21,12 +21,14 @@ export async function deleteImage(publicId) {
 }
 
 export function extractPublicIdFromUrl(cloudinaryUrl) {
-  const startIndex = cloudinaryUrl.indexOf("uploads/");
-  if (startIndex >= 0) {
+  if (cloudinaryUrl) {
+    const startIndex = cloudinaryUrl.indexOf("uploads/");
     const endIndex = cloudinaryUrl.lastIndexOf(".");
-    if (endIndex >= 0 && startIndex < endIndex) {
+
+    if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
       return cloudinaryUrl.slice(startIndex, endIndex);
     }
   }
-  return null; // Si no se pudo extraer el public_id, retornamos null
+
+  return null; // Si no se pudo extraer el public_id o la URL era null, retornamos null
 }
