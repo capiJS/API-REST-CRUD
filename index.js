@@ -68,7 +68,7 @@ app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use(
   cors({
-    origin: "https://capijs.github.io",
+    origin: ["https://capijs.github.io", "https://capijs.github.io"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Si estás usando cookies en tus solicitudes
   })
@@ -403,12 +403,12 @@ app.delete("/empleados/:em_id", async (req, res) => {
       console.log("Public ID:", publicId);
 
       if (publicId) {
-        // try {
-        await deleteImage(publicId);
-        // } catch (error) {
-        //   console.error("Error deleting image from Cloudinary: " + error);
-        //   return res.status(500).send("Error deleting image from Cloudinary");
-        // }
+        try {
+          await deleteImage(publicId);
+        } catch (error) {
+          console.error("Error deleting image from Cloudinary: " + error);
+          return res.status(500).send("Error deleting image from Cloudinary");
+        }
       }
 
       // Eliminar el empleado de la base de datos
