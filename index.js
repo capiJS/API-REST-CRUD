@@ -403,12 +403,12 @@ app.delete("/empleados/:em_id", async (req, res) => {
       console.log("Public ID:", publicId);
 
       if (publicId) {
-        try {
-          await deleteImage(publicId);
-        } catch (error) {
-          console.error("Error deleting image from Cloudinary: " + error);
-          return res.status(500).send("Error deleting image from Cloudinary");
-        }
+        // try {
+        await deleteImage(publicId);
+        // } catch (error) {
+        //   console.error("Error deleting image from Cloudinary: " + error);
+        //   return res.status(500).send("Error deleting image from Cloudinary");
+        // }
       }
 
       // Eliminar el empleado de la base de datos
