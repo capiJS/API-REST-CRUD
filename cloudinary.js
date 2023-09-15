@@ -17,21 +17,16 @@ export async function uploadImage(filePath) {
 }
 
 export async function deleteImage(publicId) {
-  try {
-    await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
-    console.error("Error deleting image from Cloudinary: " + error.message);
-    throw error;
-  }
+  return await cloudinary.uploader.destroy(publicId);
 }
 
 export function extractPublicIdFromUrl(cloudinaryUrl) {
   const startIndex = cloudinaryUrl.indexOf("uploads/");
-  const endIndex = cloudinaryUrl.lastIndexOf(".");
-
-  if (startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
-    return cloudinaryUrl.slice(startIndex, endIndex);
+  if (startIndex >= 0) {
+    const endIndex = cloudinaryUrl.lastIndexOf(".");
+    if (endIndex >= 0 && startIndex < endIndex) {
+      return cloudinaryUrl.slice(startIndex, endIndex);
+    }
   }
-
   return null; // Si no se pudo extraer el public_id, retornamos null
 }

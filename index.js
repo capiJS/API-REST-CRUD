@@ -68,10 +68,7 @@ app.use(bodyParser.json({ limit: "10mb" }));
 
 app.use(
   cors({
-    origin: [
-      "https://capijs.github.io",
-      "https://api-rest-crud-production.up.railway.app/",
-    ],
+    origin: "https://capijs.github.io",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Si estás usando cookies en tus solicitudes
   })
