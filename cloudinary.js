@@ -17,7 +17,12 @@ export async function uploadImage(filePath) {
 }
 
 export async function deleteImage(publicId) {
-  return await cloudinary.uploader.destroy(publicId);
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    console.error("Error deleting image from Cloudinary: " + error.message);
+    throw error;
+  }
 }
 
 export function extractPublicIdFromUrl(cloudinaryUrl) {
